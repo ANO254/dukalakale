@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="mb-5">
+    <h2 class="fw-bold text-center mb-3">Contact Us</h2>
+    <p class="text-center text-muted mb-5">
+        Have questions or need support? We’d love to hear from you.
+    </p>
+
+    <div class="row g-4">
+        <!-- Contact Info -->
+        <div class="col-md-5">
+            <div class="bg-dark text-light p-4 rounded-4 h-100 shadow-sm">
+                <h4 class="fw-bold mb-3">Get in Touch</h4>
+
+                <p class="mb-2">📍 Nairobi, Kenya</p>
+                <p class="mb-2">📧 support@yourbrand.com</p>
+                <p class="mb-4">📞 +254 700 000 000</p>
+
+                <p class="text-secondary">
+                    Our team is available Monday – Saturday, 9AM – 6PM.
+                </p>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="col-md-7">
+            <div class="bg-light p-4 rounded-4 shadow-sm">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" rows="5" class="form-control" required></textarea>
+                    </div>
+
+                    <button class="btn btn-dark w-100">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Store Dashboard</title>
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f9; }
+.sidebar { width: 220px; position: fixed; top:0; left:0; height:100vh; background:#343a40; color:#fff; padding-top:60px; }
+.sidebar a { color:#ccc; text-decoration:none; display:block; padding:12px 20px; margin-bottom:2px; border-radius:6px; }
+.sidebar a:hover, .sidebar a.active { background:#495057; color:#fff; }
+.content { margin-left:240px; padding:20px; }
+.card { border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+.card:hover { transform: scale(1.02); }
+.kpi-card .card-body { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.kpi-card .card-title { font-size:1.1rem; font-weight:600; }
+.kpi-card .card-text { font-size:2.5rem; font-weight:bold; }
+.badge-custom { font-size:0.85rem; font-weight:500; }
+.table thead th { background:#343a40; color:#fff; }
+.chart-card { padding:1rem; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+<h3 class="text-center mb-4">🛒 My Store</h3>
+<a href="{% url 'dashboard' %}" class="active"><i class="fa fa-home me-2"></i> Dashboard</a>
+<a href="{% url 'orders' %}"><i class="fa fa-boxes me-2"></i> Orders</a>
+<a href="{% url 'products' %}"><i class="fa fa-tags me-2"></i> Products</a>
+<a href="{% url 'customers' %}"><i class="fa fa-users me-2"></i> Customers</a>
+</div>
+
+<!-- Main content -->
+<div class="content">
+<h1 class="mb-5 text-primary">📊 Store Dashboard</h1>
+
+<!-- KPI Cards -->
+<div class="row g-4 mb-5">
+<div class="col-md-4">
+    <div class="card text-white bg-primary h-100 kpi-card">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fa fa-cart-shopping me-2"></i>Total Orders</h5>
+            <p class="card-text">{{ total_orders }}</p>
+        </div>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="card text-white bg-success h-100 kpi-card">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fa fa-money-bill-wave me-2"></i>Total Revenue</h5>
+            <p class="card-text">KES {{ total_revenue }}</p>
+        </div>
+    </div>
+</div>
+<div class="col-md-4">
+    <div class="card text-white bg-warning h-100 kpi-card">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fa fa-boxes-stacked me-2"></i>Total Products</h5>
+            <p class="card-text">{{ total_products }}</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Low Stock -->
+<div class="card mb-5 shadow-sm">
+<div class="card-header bg-danger text-white fw-bold">⚠ Low Stock Products</div>
+<ul class="list-group list-group-flush">
+    {% for p in low_stock %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ p.name }}
+        <span class="badge bg-danger rounded-pill badge-custom">{{ p.stock }}</span>
+    </li>
+    {% empty %}
+    <li class="list-group-item">No low stock items</li>
+    {% endfor %}
+</ul>
+</div>
+
+<!-- Best Sellers Table -->
+<div class="card mb-5 shadow-sm">
+<div class="card-header bg-info text-white fw-bold">🔥 Best Selling Products</div>
+<div class="card-body p-0">
+<table class="table mb-0 table-hover table-striped">
+<thead>
+<tr>
+<th>Product</th>
+<th>Total Sold</th>
+</tr>
+</thead>
+<tbody>
+{% for b in best_sellers %}
+<tr>
+<td>{{ b.product__name }}</td>
+<td>{{ b.total_sold }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card text-white bg-secondary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Investment</h5>
+                <p class="card-text display-6">KES {{ total_investment }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card text-white {% if profit >= 0 %}bg-success{% else %}bg-danger{% endif %} h-100">
+            <div class="card-body">
+                <h5 class="card-title">Profit / Loss</h5>
+                <p class="card-text display-6">KES {{ profit }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Sales Chart -->
+<div class="card shadow-sm chart-card mb-5">
+<div class="card-header bg-secondary text-white fw-bold">📈 Monthly Sales (This Year)</div>
+<div class="card-body">
+<canvas id="salesChart" height="100"></canvas>
+</div>
+</div>
+</div>
+
+<h3>Orders by Status</h3>
+<ul>
+  {% for status in orders_by_status %}
+    <li>{{ status.status }}: {{ status.count }}</li>
+  {% endfor %}
+</ul>
+
+<h3>Total Revenue (Confirmed Orders Only): KES {{ total_revenue }}</h3>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+type: 'line',
+data: {
+    labels: {{ months|safe }},
+    datasets: [{
+        label: 'Revenue KES',
+        data: {{ monthly_sales|safe }},
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3
+    }]
+},
+options: { responsive: true, plugins: { legend: { display: true, position: 'top' } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
+</body>
+</html>

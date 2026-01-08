@@ -1,0 +1,22 @@
+/* Custom site styles */
+:root{
+  --brand: #0f1724;
+  --accent: #111827;
+  --muted: #6b7280;
+}
+body{
+  background:#f8fafc;
+  color:#0b1220;
+}
+.navbar-brand{font-weight:700}
+.card{border-radius:12px}
+.card-img-top{border-top-left-radius:12px;border-top-right-radius:12px}
+.btn-dark{background:#111827;border:0}
+.btn-dark:hover{background:#0b1220}
+.container.mt-4{padding-top:1rem}
+.hero-image{max-height:360px;object-fit:cover}
+
+/* Small responsive tweaks */
+@media (max-width:576px){
+  .hero-image{max-height:220px}
+}
