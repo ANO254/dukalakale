@@ -1,26 +1,252 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="max-w-6xl mx-auto p-4">
-    <h1 class="text-4xl font-bold mb-8 text-center">Our Blog</h1>
+{% extends "base.html" %} {% block content %}
 
-    <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for post in posts %}
-        <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4 flex flex-col">
-            <!-- Smaller Responsive Image -->
-            <div class="w-full h-32 relative">
-                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="absolute inset-0 w-full h-full object-cover rounded-lg">
-            </div>
+<!-- ======================== INLINE CSS ======================== -->
+<style>
+  /* Blog Container */
+  .blog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
 
-            <!-- Blog Content -->
-            <h2 class="text-2xl font-semibold mt-4 mb-2">{{ post.title }}</h2>
-            <p class="text-gray-600 mb-4">{{ post.content|truncatewords:20 }}</p>
+  .blog-title {
+    font-size: 2.25rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: #111;
+    position: relative;
+    padding-bottom: 1rem;
+  }
 
-            <!-- Read More Button -->
-            <a href="#" class="mt-auto text-blue-500 hover:underline font-medium">Read More →</a>
-        </div>
-        {% empty %}
-        <p class="text-center text-gray-500">No blog posts available.</p>
-        {% endfor %}
-    </div>
+  .blog-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 2px;
+  }
+
+  /* Blog Grid */
+  .blog-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Blog Card */
+  .blog-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .blog-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
+
+  /* Blog Image */
+  .blog-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .blog-card:hover .blog-card-image {
+    transform: scale(1.05);
+  }
+
+  /* Blog Content */
+  .blog-card-content {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .blog-card-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .blog-card-category {
+    display: inline-block;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .blog-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .blog-card-title:hover {
+    color: #3b82f6;
+  }
+
+  .blog-card-excerpt {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    flex: 1;
+    line-height: 1.6;
+  }
+
+  /* Read More Button */
+  .blog-card-button {
+    margin-top: auto;
+    display: inline-block;
+    color: #3b82f6;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+
+  .blog-card-button:hover {
+    color: #1d4ed8;
+    padding-right: 0.5rem;
+  }
+
+  .blog-card-button::after {
+    content: " →";
+    transition: transform 0.3s ease;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+    font-size: 1.1rem;
+  }
+
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+</style>
+
+<!-- ======================== MAIN CONTENT ======================== -->
+<div class="blog-container">
+  <h1 class="blog-title">   </h1>
+
+  <div class="blog-grid">
+    <!-- Blog posts will be dynamically inserted here -->
+  </div>
 </div>
+
+<!-- ======================== INLINE JAVASCRIPT ======================== -->
+<script>
+  // Blog posts data from Django backend
+  const blogPosts = [
+    {% for post in posts %}
+    {
+      id: {{ post.id }},
+      title: "{{ post.title|escapejs }}",
+      excerpt: "{{ post.excerpt|escapejs }}",
+      content: "{{ post.content|escapejs }}",
+      image: "{{ post.image.url }}",
+      category: "{{ post.category }}",
+      date: "{{ post.created_at|date:'F d, Y' }}",
+      author: "{{ post.author }}"
+    }{% if not forloop.last %},{% endif %}
+    {% empty %}
+    {
+      id: 0,
+      title: "No Posts Yet",
+      excerpt: "Check back soon for blog updates!",
+      content: "",
+      image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=300&fit=crop",
+      category: "Blog",
+      date: "Soon",
+      author: "Admin"
+    }
+    {% endfor %}
+  ];
+
+  // Blog Manager
+  class BlogManager {
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      this.renderBlogPosts();
+    }
+
+    renderBlogPosts() {
+      const blogGrid = document.querySelector(".blog-grid");
+
+      if (blogPosts.length === 0) {
+        blogGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">📝</div>
+                        <p>No blog posts available yet. Check back soon!</p>
+                    </div>
+                `;
+        return;
+      }
+
+      blogGrid.innerHTML = blogPosts
+        .map(
+          (post) => `
+                <article class="blog-card">
+                    <img src="${post.image}" alt="${post.title}" class="blog-card-image">
+                    <div class="blog-card-content">
+                        <div class="blog-card-meta">
+                            <span class="blog-card-category">${post.category}</span>
+                            <span class="blog-card-date">${post.date}</span>
+                        </div>
+                        <h2 class="blog-card-title">${post.title}</h2>
+                        <p class="blog-card-excerpt">${post.excerpt}</p>
+                        <a href="/blog/${post.id}/" class="blog-card-button">Read More</a>
+                    </div>
+                </article>
+            `,
+        )
+        .join("");
+    }
+  }
+
+  // Initialize blog when DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    new BlogManager();
+  });
+</script>
 {% endblock %}

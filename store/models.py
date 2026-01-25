@@ -33,13 +33,48 @@ class Product(models.Model):
 
 
 # =========================
+# Product Image Model (for lightbox gallery)
+# =========================
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/')
+    alt_text = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+
+    def __str__(self):
+        return f"{self.product.name} - Image"
+
+
+# =========================
 # Blog Post Model
 # =========================
 class BlogPost(models.Model):
+    CATEGORY_CHOICES = [
+        ('Design', 'Design'),
+        ('Business', 'Business'),
+        ('Technology', 'Technology'),
+        ('Photography', 'Photography'),
+        ('Sustainability', 'Sustainability'),
+        ('Lifestyle', 'Lifestyle'),
+        ('Other', 'Other'),
+    ]
+    
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='blog_images/')
+    excerpt = models.TextField(max_length=500, default='')
     content = models.TextField()
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Other')
+    author = models.CharField(max_length=100, default='Admin')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.title
@@ -49,9 +84,25 @@ class BlogPost(models.Model):
 # Gallery Image Model
 # =========================
 class GalleryImage(models.Model):
+    CATEGORY_CHOICES = [
+        ('Nature', 'Nature'),
+        ('Landscape', 'Landscape'),
+        ('City', 'City'),
+        ('Adventure', 'Adventure'),
+        ('Beach', 'Beach'),
+        ('Sky', 'Sky'),
+        ('Water', 'Water'),
+        ('Other', 'Other'),
+    ]
+    
     title = models.CharField(max_length=100)
     image = models.ImageField(upload_to='gallery_images/')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Other')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    featured = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-uploaded_at']
 
     def __str__(self):
         return self.title
@@ -113,3 +164,17 @@ class Investment(models.Model):
 
     def __str__(self):
         return f"KES {self.amount}"
+
+
+# =========================
+# Subscription Model
+# =========================
+class Subscription(models.Model):
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.email

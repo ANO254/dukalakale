@@ -1,56 +1,97 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
 <section class="mb-5">
-    <h2 class="fw-bold text-center mb-3">Contact Us</h2>
-    <p class="text-center text-muted mb-5">
-        Have questions or need support? We’d love to hear from you.
-    </p>
+  <h2 class="fw-bold text-center mb-3">Contact Us</h2>
 
-    <div class="row g-4">
-        <!-- Contact Info -->
-        <div class="col-md-5">
-            <div class="bg-dark text-light p-4 rounded-4 h-100 shadow-sm">
-                <h4 class="fw-bold mb-3">Get in Touch</h4>
+  <div class="row g-4">
+    <!-- Contact Info -->
+    <div class="col-md-5">
+      <div class="bg-dark text-light p-4 rounded-4 h-100 shadow-sm">
+        <h4 class="fw-bold mb-3">Get in Touch</h4>
 
-                <p class="mb-2">📍 Nairobi, Kenya</p>
-                <p class="mb-2">📧 support@yourbrand.com</p>
-                <p class="mb-4">📞 +254 700 000 000</p>
+        <p class="mb-2"><i class="bi bi-geo-alt-fill"></i> Nairobi, Kenya</p>
+        <p class="mb-2">
+          <i class="bi bi-envelope-fill"></i> dukalakale@gmail.com
+        </p>
+        <p class="mb-4"><i class="bi bi-telephone-fill"></i> +254 112891632</p>
 
-                <p class="text-secondary">
-                    Our team is available Monday – Saturday, 9AM – 6PM.
-                </p>
-            </div>
+        <hr class="border-secondary" />
+
+        <h6 class="fw-bold mb-3">Follow Us</h6>
+
+        <div class="d-flex gap-3 fs-4">
+          
+
+          <a
+            href="https://www.instagram.com/duka.la.kale?igsh=MW9mNHF0OHZubGFkbA=="
+            target="_blank"
+            class="text-light text-decoration-none hover-icon"
+            title="Instagram"
+          >
+            <i class="bi bi-instagram"></i>
+          </a>
+
+          
+
+          <a
+            href="https://www.tiktok.com/@dukalakale"
+            target="_blank"
+            class="text-light text-decoration-none hover-icon"
+            title="TikTok"
+          >
+            <i class="bi bi-tiktok"></i>
+          </a>
+
+          <a
+            href="https://www.youtube.com/channel/UCsLJ6e1UVcyCqqqL2YW9l1Q"
+            target="_blank"
+            class="text-light text-decoration-none hover-icon"
+            title="YouTube"
+          >
+            <i class="bi bi-youtube"></i>
+          </a>
+
+          
         </div>
-
-        <!-- Contact Form -->
-        <div class="col-md-7">
-            <div class="bg-light p-4 rounded-4 shadow-sm">
-                <form method="post">
-                    {% csrf_token %}
-
-                    <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Message</label>
-                        <textarea name="message" rows="5" class="form-control" required></textarea>
-                    </div>
-
-                    <button class="btn btn-dark w-100">
-                        Send Message
-                    </button>
-                </form>
-            </div>
-        </div>
+      </div>
     </div>
+
+    <!-- Contact Form -->
+    <div class="col-md-7">
+      <div class="bg-light p-4 rounded-4 shadow-sm">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Message</label>
+            <textarea
+              name="message"
+              rows="5"
+              class="form-control"
+              required
+            ></textarea>
+          </div>
+
+          <a
+            href="mailto:tailoonarnold@gmail.com?subject=Website%20Contact&body=Name:%0AEmail:%0AMessage:%0A%0A"
+            class="btn btn-dark w-100 text-white"
+          >
+            📧 Send Email
+          </a>
+        </form>
+      </div>
+    </div>
+  </div>
 </section>
 
 {% endblock %}

@@ -16,6 +16,17 @@ body{
 .container.mt-4{padding-top:1rem}
 .hero-image{max-height:360px;object-fit:cover}
 
+/* Social Media Icons Hover Effect */
+.hover-icon {
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.hover-icon:hover {
+  transform: scale(1.2);
+  color: #3b82f6 !important;
+}
+
 /* Small responsive tweaks */
 @media (max-width:576px){
   .hero-image{max-height:220px}

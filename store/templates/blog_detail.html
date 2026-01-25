@@ -1,0 +1,324 @@
+{% extends "base.html" %} {% block content %}
+
+<style>
+  /* Blog Detail Container */
+  .blog-detail-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    background: white;
+  }
+
+  /* Article Header */
+  .article-header {
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 2rem;
+  }
+
+  .article-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  .article-meta {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+    color: #6b7280;
+    font-size: 0.95rem;
+  }
+
+  .article-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .article-category-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  /* Article Image */
+  .article-image {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Article Content */
+  .article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #374151;
+    margin-bottom: 3rem;
+  }
+
+  .article-content p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+  }
+
+  .article-content h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 2rem 0 1rem;
+    margin-top: 2rem;
+  }
+
+  .article-content h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .article-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Article Footer */
+  .article-footer {
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+  }
+
+  .article-author {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .article-author-label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  /* Back Button */
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .back-button:hover {
+    color: #1d4ed8;
+    transform: translateX(-4px);
+  }
+
+  /* Related Posts Section */
+  .related-posts-section {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 2px solid #e5e7eb;
+  }
+
+  .related-posts-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1.5rem;
+  }
+
+  .related-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+
+  .related-post-card {
+    background: #f9fafb;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+  }
+
+  .related-post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .related-post-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  .related-post-content {
+    padding: 1rem;
+  }
+
+  .related-post-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .related-post-date {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+  }
+
+  .related-post-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+  }
+
+  .related-post-link:hover {
+    color: #1d4ed8;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .article-title {
+      font-size: 1.75rem;
+    }
+
+    .article-content {
+      font-size: 1rem;
+    }
+
+    .article-category-badge {
+      margin-left: 0;
+      margin-top: 1rem;
+    }
+
+    .article-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+
+  /* Print Styles for Word-like appearance */
+  @media print {
+    .blog-detail-container {
+      max-width: 100%;
+      box-shadow: none;
+      background: white;
+    }
+
+    .back-button,
+    .related-posts-section {
+      display: none;
+    }
+  }
+</style>
+
+<!-- Back Navigation -->
+<div class="blog-detail-container">
+  <a href="{% url 'blog' %}" class="back-button">
+    <span>←</span> Back to Blog
+  </a>
+</div>
+
+<!-- Main Article -->
+<article class="blog-detail-container">
+  <!-- Header -->
+  <header class="article-header">
+    <h1 class="article-title">{{ post.title }}</h1>
+    <div class="article-meta">
+      <div class="article-meta-item">
+        <span class="article-author-label">By</span>
+        <span class="article-author">{{ post.author }}</span>
+      </div>
+      <div class="article-meta-item">
+        <span>📅 {{ post.created_at|date:"F d, Y" }}</span>
+      </div>
+      <span class="article-category-badge">{{ post.category }}</span>
+    </div>
+  </header>
+
+  <!-- Featured Image -->
+  {% if post.image %}
+  <img
+    src="{{ post.image.url }}"
+    alt="{{ post.title }}"
+    class="article-image"
+  />
+  {% endif %}
+
+  <!-- Content -->
+  <div class="article-content">{{ post.content|safe|linebreaks }}</div>
+
+  <!-- Article Footer -->
+  <div class="article-footer">
+    <p>
+      <span class="article-author-label">Written by:</span>
+      <span class="article-author">{{ post.author }}</span>
+    </p>
+    <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem">
+      Published on {{ post.created_at|date:"F d, Y \a\t g:i A" }} {% if
+      post.updated_at != post.created_at %}· Updated {{ post.updated_at|date:"F
+      d, Y" }}{% endif %}
+    </p>
+  </div>
+</article>
+
+<!-- Related Posts -->
+{% if related_posts %}
+<div class="blog-detail-container">
+  <section class="related-posts-section">
+    <h2 class="related-posts-title">Related Articles</h2>
+    <div class="related-posts-grid">
+      {% for related_post in related_posts %}
+      <div class="related-post-card">
+        {% if related_post.image %}
+        <img
+          src="{{ related_post.image.url }}"
+          alt="{{ related_post.title }}"
+          class="related-post-image"
+        />
+        {% endif %}
+        <div class="related-post-content">
+          <h3 class="related-post-title">{{ related_post.title }}</h3>
+          <p class="related-post-date">
+            {{ related_post.created_at|date:"F d, Y" }}
+          </p>
+          <a
+            href="{% url 'blog_detail' related_post.id %}"
+            class="related-post-link"
+          >
+            Read More →
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endif %} {% endblock %}

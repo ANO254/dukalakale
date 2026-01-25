@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from .models import Product, BlogPost, GalleryImage
+from django.views.decorators.http import require_http_methods
+from .models import Product, BlogPost, GalleryImage, Subscription
 from .cart import Cart
 
 # =========================
@@ -114,8 +115,41 @@ def blog_view(request):
     return render(request, "blog.html", {"posts": posts})
 
 # =========================
+# Blog Detail Page
+# =========================
+def blog_detail(request, id):
+    post = get_object_or_404(BlogPost, id=id)
+    # Get related posts (same category, excluding current)
+    related_posts = BlogPost.objects.filter(category=post.category).exclude(id=post.id)[:3]
+    return render(request, "blog_detail.html", {
+        "post": post,
+        "related_posts": related_posts
+    })
+
+# =========================
 # Gallery Page
 # =========================
 def gallery_view(request):
     images = GalleryImage.objects.all().order_by('-uploaded_at')
     return render(request, "gallery.html", {"images": images})
+
+# =========================
+# Subscribe to Newsletter
+# =========================
+@require_http_methods(["POST"])
+def subscribe(request):
+    email = request.POST.get('email', '').strip()
+    
+    if not email:
+        return JsonResponse({'success': False, 'message': 'Email is required'})
+    
+    # Check if email already exists
+    if Subscription.objects.filter(email=email).exists():
+        return JsonResponse({'success': False, 'message': 'This email is already subscribed'})
+    
+    # Save to database
+    try:
+        Subscription.objects.create(email=email)
+        return JsonResponse({'success': True, 'message': 'Thank you for subscribing!'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': 'Error subscribing. Please try again.'})

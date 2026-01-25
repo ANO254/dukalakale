@@ -1,74 +1,371 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
-<div class="max-w-6xl mx-auto p-4">
-    <h1 class="text-4xl font-bold mb-8 text-center">Gallery</h1>
+<!-- ======================== INLINE CSS ======================== -->
+<style>
+  /* Gallery Grid Layout */
+  .gallery-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
 
-    <!-- Instagram-style responsive grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
-        {% for image in images %}
-        <div class="relative w-full aspect-square overflow-hidden cursor-pointer group"
-             @click="openModal({{ forloop.counter0 }})">
-            <img src="{{ image.image.url }}" 
-                 alt="{{ image.title }}" 
-                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
-            <div class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 text-sm rounded">
-                {{ image.title }}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
+  .gallery-title {
+    font-size: 2.25rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #111;
+  }
 
-<!-- Modal Lightbox -->
-<div x-data="gallery()" x-show="isOpen" x-cloak
-     class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+  .gallery-grid {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
 
-    <!-- Close Button -->
-    <button @click="closeModal()"
-            class="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-500 transition">&times;</button>
-
-    <!-- Previous Button -->
-    <button @click="prev()" 
-            class="absolute left-4 text-white text-4xl font-bold hover:text-gray-300 transition">&larr;</button>
-
-    <!-- Next Button -->
-    <button @click="next()" 
-            class="absolute right-4 text-white text-4xl font-bold hover:text-gray-300 transition">&rarr;</button>
-
-    <!-- Image container -->
-    <div class="max-w-[90vw] max-h-[90vh] flex items-center justify-center">
-        <img :src="images[currentIndex]" 
-             class="object-contain max-h-full max-w-full rounded shadow-lg">
-    </div>
-</div>
-
-<!-- Alpine.js for lightbox -->
-<script>
-function gallery() {
-    return {
-        images: [
-            {% for image in images %}
-            '{{ image.image.url }}',
-            {% endfor %}
-        ],
-        isOpen: false,
-        currentIndex: 0,
-        openModal(index) {
-            this.currentIndex = index;
-            this.isOpen = true;
-        },
-        closeModal() {
-            this.isOpen = false;
-        },
-        prev() {
-            this.currentIndex = (this.currentIndex === 0) ? this.images.length - 1 : this.currentIndex - 1;
-        },
-        next() {
-            this.currentIndex = (this.currentIndex === this.images.length - 1) ? 0 : this.currentIndex + 1;
-        }
+  /* Responsive Grid */
+  @media (max-width: 768px) {
+    .gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
-}
+  }
+
+  @media (max-width: 480px) {
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Gallery Item */
+  .gallery-item {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+  }
+
+  .gallery-item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .gallery-item:hover .gallery-item-image {
+    transform: scale(1.08);
+  }
+
+  .gallery-item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    padding: 1rem;
+    color: white;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .gallery-item:hover .gallery-item-overlay {
+    transform: translateY(0);
+  }
+
+  .gallery-item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  /* Lightbox Modal */
+  .lightbox-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+
+  .lightbox-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-image {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    animation: fadeInScale 0.3s ease;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Lightbox Controls */
+  .lightbox-button {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    z-index: 1010;
+  }
+
+  .lightbox-button:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+  }
+
+  .lightbox-button:active {
+    transform: scale(0.95);
+  }
+
+  .lightbox-close {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .lightbox-prev {
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .lightbox-next {
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* Image Counter */
+  .lightbox-counter {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    z-index: 1010;
+  }
+
+  /* Prevent scrolling when lightbox is open */
+  body.lightbox-open {
+    overflow: hidden;
+  }
+
+  /* Keyboard hint */
+  .lightbox-hint {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    z-index: 1010;
+  }
+</style>
+
+<!-- ======================== MAIN CONTENT ======================== -->
+<div class="gallery-container">
+  </h2 class="gallery-title">  </h2
+
+  <!-- Instagram-style responsive grid -->
+  <div class="gallery-grid" id="galleryGrid">
+    <!-- Gallery items will be dynamically inserted here -->
+  </div>
+</div>
+
+<!-- ======================== LIGHTBOX MODAL ======================== -->
+<div class="lightbox-backdrop" id="lightboxBackdrop">
+  <div class="lightbox-hint">Press ESC to close • Arrow keys to navigate</div>
+
+  <button
+    class="lightbox-button lightbox-close"
+    id="closeBtn"
+    aria-label="Close lightbox"
+  >
+    ✕
+  </button>
+
+  <button
+    class="lightbox-button lightbox-prev"
+    id="prevBtn"
+    aria-label="Previous image"
+  >
+    ‹
+  </button>
+
+  <button
+    class="lightbox-button lightbox-next"
+    id="nextBtn"
+    aria-label="Next image"
+  >
+    ›
+  </button>
+
+  <div class="lightbox-content">
+    <img id="lightboxImage" class="lightbox-image" src="" alt="Gallery image" />
+  </div>
+
+  <div class="lightbox-counter" id="imageCounter">1 / 1</div>
+</div>
+
+<!-- ======================== INLINE JAVASCRIPT ======================== -->
+<script>
+  // Gallery image data from Django backend
+  const galleryImages = [
+    {% for image in images %}
+    {
+      src: "{{ image.image.url }}",
+      title: "{{ image.title|escapejs }}",
+      category: "{{ image.category }}"
+    }{% if not forloop.last %},{% endif %}
+    {% empty %}
+    {
+      src: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=500&h=500&fit=crop",
+      title: "No Images Yet",
+      category: "Gallery"
+    }
+    {% endfor %}
+  ];
+
+  // Gallery Manager
+  class GalleryManager {
+    constructor() {
+      this.currentIndex = 0;
+      this.isLightboxOpen = false;
+      this.init();
+    }
+
+    init() {
+      this.renderGallery();
+      this.attachEventListeners();
+    }
+
+    renderGallery() {
+      const galleryGrid = document.getElementById("galleryGrid");
+      galleryGrid.innerHTML = "";
+
+      galleryImages.forEach((image, index) => {
+        const item = document.createElement("div");
+        item.className = "gallery-item";
+        item.innerHTML = `
+                    <img src="${image.src}" alt="${image.title}" class="gallery-item-image">
+                    <div class="gallery-item-overlay">
+                        <div class="gallery-item-title">${image.title}</div>
+                    </div>
+                `;
+        item.addEventListener("click", () => this.openLightbox(index));
+        galleryGrid.appendChild(item);
+      });
+    }
+
+    attachEventListeners() {
+      const backdrop = document.getElementById("lightboxBackdrop");
+      const closeBtn = document.getElementById("closeBtn");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      closeBtn.addEventListener("click", () => this.closeLightbox());
+      prevBtn.addEventListener("click", () => this.showPrevious());
+      nextBtn.addEventListener("click", () => this.showNext());
+
+      // Close on backdrop click (but not image click)
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) {
+          this.closeLightbox();
+        }
+      });
+
+      // Keyboard navigation
+      document.addEventListener("keydown", (e) => {
+        if (!this.isLightboxOpen) return;
+
+        switch (e.key) {
+          case "Escape":
+            this.closeLightbox();
+            break;
+          case "ArrowLeft":
+            this.showPrevious();
+            break;
+          case "ArrowRight":
+            this.showNext();
+            break;
+        }
+      });
+    }
+
+    openLightbox(index) {
+      this.currentIndex = index;
+      this.isLightboxOpen = true;
+      this.updateLightbox();
+      document.body.classList.add("lightbox-open");
+      document.getElementById("lightboxBackdrop").classList.add("active");
+    }
+
+    closeLightbox() {
+      this.isLightboxOpen = false;
+      document.body.classList.remove("lightbox-open");
+      document.getElementById("lightboxBackdrop").classList.remove("active");
+    }
+
+    showPrevious() {
+      this.currentIndex =
+        (this.currentIndex - 1 + galleryImages.length) % galleryImages.length;
+      this.updateLightbox();
+    }
+
+    showNext() {
+      this.currentIndex = (this.currentIndex + 1) % galleryImages.length;
+      this.updateLightbox();
+    }
+
+    updateLightbox() {
+      const image = galleryImages[this.currentIndex];
+      document.getElementById("lightboxImage").src = image.src;
+      document.getElementById("lightboxImage").alt = image.title;
+      document.getElementById("imageCounter").textContent =
+        `${this.currentIndex + 1} / ${galleryImages.length}`;
+    }
+  }
+
+  // Initialize gallery when DOM is ready
+  document.addEventListener("DOMContentLoaded", () => {
+    new GalleryManager();
+  });
 </script>
 
 {% endblock %}
