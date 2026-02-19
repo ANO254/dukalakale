@@ -1,0 +1,8 @@
+Django==6.0
+gunicorn
+whitenoise
+psycopg2-binary
+python-dotenv
+django-admin-sortable2
+dj-database-url
+Pillow

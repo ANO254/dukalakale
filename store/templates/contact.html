@@ -1,7 +1,115 @@
 {% extends "base.html" %} {% block content %}
+<!-- Simple Social Header -->
+<!-- Simple Social Header -->
+<!-- Premium Social Header Section -->
+<section style="background-color: #000; padding: 40px 0; position: relative; overflow: hidden;">
+  
+  <!-- Optional subtle floating background circles -->
+  <div style="
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(212,160,23,0.1);
+      border-radius: 50%;
+      top: -50px;
+      left: -50px;
+      animation: floatCircle 8s ease-in-out infinite alternate;">
+  </div>
+  <div style="
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: rgba(212,160,23,0.1);
+      border-radius: 50%;
+      bottom: -30px;
+      right: -30px;
+      animation: floatCircle 10s ease-in-out infinite alternate;">
+  </div>
+
+
+  <h2 class="mb-3 text-center"
+    style="color: #d4a017; 
+           font-family: 'Oswald', sans-serif; 
+           letter-spacing: 2px; 
+           font-size: 2rem;">
+  Contact Us
+</h2>
+
+  <!-- Social Icons -->
+  <div style="position: relative; z-index: 1; text-align: center;">
+    <a href="https://www.instagram.com/duka.la.kale?igsh=MW9mNHF0OHZubGFkbA==" target="_blank" class="social-icon">
+      <i class="fab fa-instagram"></i>
+    </a>
+    <a href="https://www.youtube.com/channel/UCsLJ6e1UVcyCqqqL2YW9l1Q" target="_blank" class="social-icon">
+      <i class="fab fa-youtube"></i>
+    </a>
+    <a href="https://www.tiktok.com/@dukalakale" target="_blank" class="social-icon">
+      <i class="fab fa-tiktok"></i>
+    </a>
+    <a href="tel:+254112891632" class="social-icon">
+  <i class="fas fa-phone"></i>
+</a>
+
+    <a href="sms:+254700000000" class="social-icon">
+  <i class="fas fa-comment-dots"></i>
+</a>
+
+<a href="mailto:tailoonarnold@gmail.com" class="social-icon">
+  <i class="fas fa-envelope"></i>
+</a>
+
+
+  </div>
+</section>
+
+<!-- Styles & Animations -->
+<style>
+  /* FontAwesome icons styling */
+  .social-icon i {
+    font-size: 32px;
+    color: #d4a017;
+    margin: 0 20px;
+    transition: transform 0.3s, text-shadow 0.3s;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .social-icon i:hover {
+    transform: scale(1.4);
+    text-shadow: 0 0 15px #d4a017;
+  }
+
+  /* Floating up-down motion for icons */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* Floating background circles */
+  @keyframes floatCircle {
+    0% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-20px) translateX(15px); }
+    100% { transform: translateY(0) translateX(0); }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .social-icon i {
+      font-size: 28px;
+      margin: 0 12px;
+    }
+  }
+</style>
+
+
+<!-- NOTE: Make sure FontAwesome or your preferred icon font is loaded -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+
 
 <section class="mb-5">
-  <h2 class="fw-bold text-center mb-3">Contact Us</h2>
+
 
   <div class="row g-4">
     <!-- Contact Info -->
@@ -56,42 +164,37 @@
       </div>
     </div>
 
-    <!-- Contact Form -->
-    <div class="col-md-7">
-      <div class="bg-light p-4 rounded-4 shadow-sm">
-        <form method="post">
-          {% csrf_token %}
+<!-- Contact Form -->
 
-          <div class="mb-3">
-            <label class="form-label">Full Name</label>
-            <input type="text" name="name" class="form-control" required />
-          </div>
+<!--
+<div class="col-md-7">
+  <div class="bg-light p-4 rounded-4 shadow-sm">
+    <form method="post">
+      {% csrf_token %}
 
-          <div class="mb-3">
-            <label class="form-label">Email Address</label>
-            <input type="email" name="email" class="form-control" required />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Message</label>
-            <textarea
-              name="message"
-              rows="5"
-              class="form-control"
-              required
-            ></textarea>
-          </div>
-
-          <a
-            href="mailto:tailoonarnold@gmail.com?subject=Website%20Contact&body=Name:%0AEmail:%0AMessage:%0A%0A"
-            class="btn btn-dark w-100 text-white"
-          >
-            📧 Send Email
-          </a>
-        </form>
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="name" class="form-control" required />
       </div>
-    </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control" required />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Message</label>
+        <textarea name="message" rows="5" class="form-control" required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-dark w-100 text-white">
+        📧 Send Email
+      </button>
+
+    </form>
   </div>
+</div> 
 </section>
+-->
 
 {% endblock %}

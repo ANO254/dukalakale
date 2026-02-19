@@ -1,9 +1,13 @@
 from django.contrib import admin
+try:
+    from adminsortable2.admin import SortableInlineAdminMixin
+except Exception:
+    SortableInlineAdminMixin = None
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.utils.html import format_html
-from .models import Category, Product, Order, OrderItem, Investment, BlogPost, GalleryImage, Subscription, ProductImage
+from .models import Category, Product, Order, OrderItem, Investment, BlogPost, GalleryImage, Subscription, ProductImage, BlogBlock
 
 User = get_user_model()
 
@@ -59,6 +63,29 @@ class BlogPostAdmin(admin.ModelAdmin):
             )
         return "No image"
     preview_image.short_description = "Image Preview"
+
+    # Allow flexible blocks (image/text) to be added in admin
+    inlines = []
+
+
+class BlogBlockInline(admin.StackedInline):
+    """Fallback inline; if adminsortable2 is installed the mixin below will be used."""
+    model = BlogBlock
+    extra = 1
+    fields = ('order', 'block_type', 'text', 'image', 'caption')
+    ordering = ('order',)
+
+
+# If adminsortable2 is available, create a nicer inline with drag-to-reorder
+if SortableInlineAdminMixin is not None:
+    class BlogBlockInline(SortableInlineAdminMixin, admin.StackedInline):
+        model = BlogBlock
+        extra = 1
+        fields = ('order', 'block_type', 'text', 'image', 'caption')
+        ordering = ('order',)
+
+# attach inline to BlogPostAdmin
+BlogPostAdmin.inlines = [BlogBlockInline]
 
 
 # =========================

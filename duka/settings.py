@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,17 +21,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l=r0qjaxw^pb=!p3%77k#i=^*zd7g=ei#i__csljmc37^37gpx'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!p3%77k#i=^*zd7g=ei#i__csljmc37^37gpx')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.10']
+# ALLOWED_HOSTS can be set via env var (comma-separated)
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,*.railway.app').split(',')
+
+# Railway environment detection
+IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+if IS_RAILWAY:
+    DEBUG = False
 
 
 
 
 STATIC_URL = '/static/'
+
+# Directory for collected static files (for deployment)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Optional if you want a global static folder outside apps
 STATICFILES_DIRS = [
@@ -57,6 +67,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise inserted below only if available to avoid import errors in dev
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,6 +75,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Add WhiteNoise middleware dynamically if package is installed
+try:
+    import whitenoise  # noqa: F401
+    # insert after SecurityMiddleware
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+except Exception:
+    pass
 
 ROOT_URLCONF = 'duka.urls'
 
@@ -88,12 +107,24 @@ WSGI_APPLICATION = 'duka.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import dj_database_url
+
+# Use PostgreSQL in production (Railway), SQLite locally
+if IS_RAILWAY or os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite3'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -132,3 +163,36 @@ USE_TZ = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Use whitenoise staticfiles storage in production when available
+if IS_RAILWAY:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    STATICFILES_STORAGE = os.environ.get('DJANGO_STATICFILES_STORAGE', 'whitenoise.storage.CompressedManifestStaticFilesStorage')
+
+# Security settings for production
+if IS_RAILWAY or not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_SECURITY_POLICY = {
+        'default-src': ("'self'",),
+    }
+    ALLOWED_HOSTS = ['*']  # Railway handles domain routing
+
+
+
+
+# ================= EMAIL CONFIGURATION =================
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'youremail@gmail.com'        # ← replace with your Gmail
+EMAIL_HOST_PASSWORD = 'your_app_password'      # ← replace with Gmail App Password
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

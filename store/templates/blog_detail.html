@@ -1,324 +1,237 @@
 {% extends "base.html" %} {% block content %}
 
-<style>
-  /* Blog Detail Container */
-  .blog-detail-container {
-    max-width: 850px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-    background: white;
-  }
-
-  /* Article Header */
-  .article-header {
-    margin-bottom: 3rem;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 2rem;
-  }
-
-  .article-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 1rem;
-    line-height: 1.3;
-  }
-
-  .article-meta {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-    flex-wrap: wrap;
-    color: #6b7280;
-    font-size: 0.95rem;
-  }
-
-  .article-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .article-category-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-left: auto;
-  }
-
-  /* Article Image */
-  .article-image {
-    width: 100%;
-    max-height: 500px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Article Content */
-  .article-content {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #374151;
-    margin-bottom: 3rem;
-  }
-
-  .article-content p {
-    margin-bottom: 1.5rem;
-    text-align: justify;
-  }
-
-  .article-content h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #111827;
-    margin: 2rem 0 1rem;
-    margin-top: 2rem;
-  }
-
-  .article-content h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 1.5rem 0 0.75rem;
-  }
-
-  .article-content ul,
-  .article-content ol {
-    margin-left: 2rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .article-content li {
-    margin-bottom: 0.5rem;
-  }
-
-  /* Article Footer */
-  .article-footer {
-    border-top: 1px solid #e5e7eb;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1.5rem 0;
-    margin-bottom: 2rem;
-  }
-
-  .article-author {
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .article-author-label {
-    color: #6b7280;
-    font-weight: 500;
-  }
-
-  /* Back Button */
-  .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 600;
-    margin-bottom: 2rem;
-    transition: all 0.3s ease;
-  }
-
-  .back-button:hover {
-    color: #1d4ed8;
-    transform: translateX(-4px);
-  }
-
-  /* Related Posts Section */
-  .related-posts-section {
-    margin-top: 4rem;
-    padding-top: 3rem;
-    border-top: 2px solid #e5e7eb;
-  }
-
-  .related-posts-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 1.5rem;
-  }
-
-  .related-posts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-  }
-
-  .related-post-card {
-    background: #f9fafb;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    border: 1px solid #e5e7eb;
-  }
-
-  .related-post-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-
-  .related-post-image {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-  }
-
-  .related-post-content {
-    padding: 1rem;
-  }
-
-  .related-post-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-  }
-
-  .related-post-date {
-    font-size: 0.85rem;
-    color: #6b7280;
-    margin-bottom: 0.75rem;
-  }
-
-  .related-post-link {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
-  }
-
-  .related-post-link:hover {
-    color: #1d4ed8;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .article-title {
-      font-size: 1.75rem;
+<div
+  class="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 pt-8 pb-24 font-sans"
+  style="font-family: 'Segoe UI', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;"
+>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    
+    body { font-family: 'Inter', 'Segoe UI', sans-serif; }
+    
+    /* Modern heading styles - bold white, no gradient */
+    .post-title {
+      color: #ffffff;
+      display: inline-block;
+      line-height: 1.05;
+      font-weight: 800;
+      font-size: 2.25rem;
+      transform: translateY(12px);
+      opacity: 0;
+      transition:
+        transform 700ms cubic-bezier(0.2, 0.9, 0.2, 1),
+        opacity 700ms;
+      letter-spacing: -0.02em;
     }
 
-    .article-content {
-      font-size: 1rem;
+    .post-title.in-view {
+      transform: translateY(0);
+      opacity: 1;
     }
 
-    .article-category-badge {
-      margin-left: 0;
-      margin-top: 1rem;
+    /* Image container adjustments for responsive, medium size images */
+    .responsive-media img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+    .featured-hero {
+      max-height: 64vh;
+      overflow: hidden;
+    }
+    @media (min-width: 1024px) {
+      .featured-hero img {
+        max-height: 54vh;
+      }
+    }
+    @media (max-width: 640px) {
+      .featured-hero img {
+        max-height: 48vh;
+      }
     }
 
-    .article-meta {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
+    /* Subtle image reveal on scroll */
+    .animate-on-scroll {
+      transform: translateY(10px) scale(0.995);
+      opacity: 0;
+      transition:
+        transform 650ms ease,
+        opacity 650ms ease;
     }
-  }
-
-  /* Print Styles for Word-like appearance */
-  @media print {
-    .blog-detail-container {
-      max-width: 100%;
-      box-shadow: none;
-      background: white;
+    .animate-on-scroll.in-view {
+      transform: translateY(0) scale(1);
+      opacity: 1;
     }
 
-    .back-button,
-    .related-posts-section {
-      display: none;
+    /* Medium card style for related posts */
+    .related-card {
+      transition:
+        transform 300ms ease,
+        box-shadow 300ms ease;
     }
-  }
-</style>
+    .related-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(2, 6, 23, 0.06);
+    }
+  </style>
 
-<!-- Back Navigation -->
-<div class="blog-detail-container">
-  <a href="{% url 'blog' %}" class="back-button">
-    <span>←</span> Back to Blog
-  </a>
-</div>
+  <div class="mx-auto max-w-3xl px-5 sm:px-8 lg:px-12">
+    <!-- Back + meta row -->
+    <div class="mb-10 flex flex-wrap items-center justify-between gap-4">
+      <a
+        href="{% url 'blog' %}"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/20 transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:-translate-y-0.5"
+      >
+        <span class="text-lg transition-transform group-hover:-translate-x-1">←</span>
+        <span class="font-semibold text-sm">Back</span>
+      </a>
 
-<!-- Main Article -->
-<article class="blog-detail-container">
-  <!-- Header -->
-  <header class="article-header">
-    <h1 class="article-title">{{ post.title }}</h1>
-    <div class="article-meta">
-      <div class="article-meta-item">
-        <span class="article-author-label">By</span>
-        <span class="article-author">{{ post.author }}</span>
+      <div
+        class="flex flex-wrap items-center gap-4 text-sm text-gray-300"
+      >
+        <time datetime="{{ post.created_at|date:'Y-m-d' }}">
+          {{ post.created_at|date:"d M Y" }}
+        </time>
+        <span
+          class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-500/30 text-blue-200 border border-blue-400/30"
+        >
+          {{ post.category }}
+        </span>
       </div>
-      <div class="article-meta-item">
-        <span>📅 {{ post.created_at|date:"F d, Y" }}</span>
-      </div>
-      <span class="article-category-badge">{{ post.category }}</span>
     </div>
-  </header>
 
-  <!-- Featured Image -->
-  {% if post.image %}
-  <img
-    src="{{ post.image.url }}"
-    alt="{{ post.title }}"
-    class="article-image"
-  />
-  {% endif %}
+    <!-- Title + author -->
+    <header class="mb-12">
+      <h1
+        id="postTitle"
+        class="post-title"
+      >
+        {{ post.title }}
+      </h1>
 
-  <!-- Content -->
-  <div class="article-content">{{ post.content|safe|linebreaks }}</div>
+      <div
+        class="mt-6 flex items-center gap-4 text-gray-300"
+      >
+        <div class="font-medium">By {{ post.author }}</div>
+        <div
+          class="w-1.5 h-1.5 rounded-full bg-gray-500"
+        ></div>
+        <time class="text-gray-400">
+          {{ post.created_at|date:"F d, Y" }}
+        </time>
+      </div>
+    </header>
 
-  <!-- Article Footer -->
-  <div class="article-footer">
-    <p>
-      <span class="article-author-label">Written by:</span>
-      <span class="article-author">{{ post.author }}</span>
-    </p>
-    <p style="color: #6b7280; font-size: 0.9rem; margin-top: 0.5rem">
-      Published on {{ post.created_at|date:"F d, Y \a\t g:i A" }} {% if
-      post.updated_at != post.created_at %}· Updated {{ post.updated_at|date:"F
-      d, Y" }}{% endif %}
-    </p>
-  </div>
-</article>
-
-<!-- Related Posts -->
-{% if related_posts %}
-<div class="blog-detail-container">
-  <section class="related-posts-section">
-    <h2 class="related-posts-title">Related Articles</h2>
-    <div class="related-posts-grid">
-      {% for related_post in related_posts %}
-      <div class="related-post-card">
-        {% if related_post.image %}
-        <img
-          src="{{ related_post.image.url }}"
-          alt="{{ related_post.title }}"
-          class="related-post-image"
-        />
-        {% endif %}
-        <div class="related-post-content">
-          <h3 class="related-post-title">{{ related_post.title }}</h3>
-          <p class="related-post-date">
-            {{ related_post.created_at|date:"F d, Y" }}
-          </p>
-          <a
-            href="{% url 'blog_detail' related_post.id %}"
-            class="related-post-link"
-          >
-            Read More →
-          </a>
+    <!-- Featured image -->
+    {% if post.image %}
+    <div class="mb-14 -mx-5 sm:-mx-8 lg:-mx-12 xl:mx-0">
+      <div
+        class="aspect-[16/9] overflow-hidden rounded-2xl shadow-2xl shadow-indigo-100/50 dark:shadow-black/40"
+      >
+        <div class="relative rounded-xl overflow-hidden featured-hero">
+          <img
+            src="{{ post.image.url }}"
+            alt="{{ post.title }}"
+            class="w-full h-auto object-cover animate-on-scroll"
+          />
         </div>
       </div>
-      {% endfor %}
     </div>
-  </section>
+    {% endif %}
+
+    <!-- Main content -->
+    <article
+      class="prose prose-lg sm:prose-xl dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-white prose-p:text-gray-200 prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-blue-400 prose-blockquote:text-gray-300 max-w-none mb-20"
+    >
+      {% if post.blocks.exists %}
+        {% for block in post.blocks.all %}
+          {% if block.block_type == 'image' and block.image %}
+            <figure class="my-10 sm:my-14 not-prose">
+              <div class="overflow-hidden rounded-xl shadow-lg shadow-gray-200/60 dark:shadow-black/30">
+                <div class="mt-8 responsive-media">
+                  <img src="{{ block.image.url }}" alt="{{ block.caption|default:post.title }}" class="w-full h-auto object-cover rounded-lg animate-on-scroll" />
+                </div>
+              </div>
+              {% if block.caption %}
+                <figcaption class="mt-3 text-center text-sm text-gray-500 dark:text-gray-400 italic">{{ block.caption }}</figcaption>
+              {% endif %}
+            </figure>
+          {% elif block.block_type == 'text' and block.text %}
+            <div class="my-8">{{ block.text|safe|linebreaks }}</div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {{ post.content|safe|linebreaks }}
+      {% endif %}
+    </article>
+
+    <!-- Footer meta -->
+    <footer
+      class="pt-12 border-t border-gray-700 text-sm text-gray-400"
+    >
+      <p>
+        Written by
+        <strong class="text-white"
+          >{{ post.author }}</strong
+        >
+      </p>
+    </footer>
+
+    {% if related_posts %}
+    <section class="mt-12">
+      <h3 class="sr-only">Related Posts</h3>
+      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {% for rel in related_posts %}
+        <a
+          href="{% url 'blog_detail' rel.id %}"
+          class="group block rounded-xl overflow-hidden related-card bg-gray-800/50 border border-gray-700 hover:border-gray-600 hover:bg-gray-800/70"
+        >
+          {% if rel.image %}
+          <div class="relative h-44 overflow-hidden">
+            <img
+              src="{{ rel.image.url }}"
+              alt="{{ rel.title }}"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
+          {% endif %}
+          <div class="p-4">
+            <h4 class="text-lg font-semibold text-white">
+              {{ rel.title }}
+            </h4>
+            <p class="text-sm text-gray-400 mt-1">
+              {{ rel.excerpt|default:rel.content|truncatewords:18 }}
+            </p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  </div>
+
+  <script>
+    (function () {
+      // Intersection observer to add in-view class for reveals
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in-view");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+
+      document
+        .querySelectorAll(".animate-on-scroll, .post-title")
+        .forEach((el) => io.observe(el));
+    })();
+  </script>
+
+  {% endblock %}
 </div>
-{% endif %} {% endblock %}

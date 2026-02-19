@@ -1,12 +1,12 @@
 /* Custom site styles */
 :root{
-  --brand: #0f1724;
-  --accent: #111827;
+  --brand: #FFD700;
+  --accent: #FFD700;
   --muted: #6b7280;
 }
 body{
-  background:#f8fafc;
-  color:#0b1220;
+  background: #000000;
+  color: #FFD700;
 }
 .navbar-brand{font-weight:700}
 .card{border-radius:12px}

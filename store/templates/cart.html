@@ -1,104 +1,342 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 
-<h2 class="fw-bold mb-4 text-center">🛒 Your Shopping Cart</h2>
+<h2 class="fw-bold mb-4 text-center" style="color: #eaa329;">🛒 Your Shopping Cart</h2>
 
 {% if cart_items %}
 <div class="row g-4">
-    <div class="col-lg-8">
-        {% for item in cart_items %}
-        <div class="card mb-3 shadow-sm border-0">
-            <div class="row g-0 align-items-center">
-                <div class="col-md-3 text-center p-3">
-                    <img src="{{ item.image }}" class="img-fluid rounded" style="max-height:100px;" alt="{{ item.name }}">
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card-body">
-                        <h5 class="fw-semibold mb-1">{{ item.name }}</h5>
-                        <p class="text-muted mb-1">
-                            Quantity:
-                            <input type="number" value="{{ item.quantity }}" min="1" class="form-control quantity-input" data-product-id="{{ item.id }}">
-                        </p>
-                        <p class="text-muted mb-0">
-                            Price: KES {{ item.price|floatformat:2 }}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="col-md-3 text-center">
-                    <div class="p-3">
-                        <p class="fw-bold mb-2">
-                            KES {{ item.price|floatformat:2 }}
-                        </p>
-
-                        <form method="POST" action="{% url 'remove_from_cart' item.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-outline-danger mt-2">
-                                Remove
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+  <div class="col-lg-8">
+    {% for item in cart_items %}
+    <div class="card mb-3 shadow-sm border-0">
+      <div class="row g-0 align-items-center">
+        <div class="col-md-3 text-center p-3">
+          <img
+            src="{{ item.image }}"
+            class="img-fluid rounded"
+            style="max-height: 100px"
+            alt="{{ item.name }}"
+          />
         </div>
-        {% endfor %}
-    </div>
 
-    <div class="col-lg-4">
-        <div class="card shadow-sm border-0 sticky-top" style="top: 90px;">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">Order Summary</h5>
-
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Total Items</span>
-                    <span>{{ cart_items|length }}</span>
-                </div>
-
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Total</span>
-                    <span class="fw-bold" id="cart-total">KES {{ total|floatformat:2 }}</span>
-                </div>
-
-                <button class="btn btn-dark w-100">
-                    Proceed to Checkout →
-                </button>
-            </div>
+        <div class="col-md-6">
+          <div class="card-body">
+            <h5 class="fw-semibold mb-1">{{ item.name }}</h5>
+            <p class="text-muted mb-1" style="color: #555;">{{ item.description }}</p>
+              Quantity:
+              <input
+                type="number"
+                value="{{ item.quantity }}"
+                min="1"
+                class="form-control quantity-input"
+                data-product-id="{{ item.id }}"
+              />
+            </p>
+            <p class="text-muted mb-0">
+              Price: KES {{ item.price|floatformat:2 }}
+            </p>
+          </div>
         </div>
+
+        <div class="col-md-3 text-center">
+          <div class="p-3">
+            <p class="fw-bold mb-2">KES {{ item.price|floatformat:2 }}</p>
+
+            <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger mt-2">
+                Remove
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
+    {% endfor %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 sticky-top" style="top: 90px">
+      <div class="card-body">
+        <h5 class="fw-bold mb-3">Order Summary</h5>
+
+        <div class="d-flex justify-content-between mb-2">
+          <span>Total Items</span>
+          <span>{{ cart_items|length }}</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span>Total</span>
+          <span class="fw-bold" id="cart-total"
+            >KES {{ total|floatformat:2 }}</span
+          >
+        </div>
+
+        <button
+          class="btn btn-dark w-100"
+          id="checkoutBtn"
+          data-bs-toggle="modal"
+          data-bs-target="#checkoutModal"
+        >
+          Proceed to Checkout →
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-document.querySelectorAll('.quantity-input').forEach(input => {
-    input.addEventListener('change', function() {
-        const productId = this.dataset.productId;
-        const quantity = this.value;
+  document.querySelectorAll(".quantity-input").forEach((input) => {
+    input.addEventListener("change", function () {
+      const productId = this.dataset.productId;
+      const quantity = this.value;
 
-        fetch(`/cart/update-quantity/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `quantity=${quantity}`
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('cart-total').innerText = data.total;
-            }
+      fetch(`/cart/update-quantity/${productId}/`, {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": "{{ csrf_token }}",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `quantity=${quantity}`,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            document.getElementById("cart-total").innerText = data.total;
+          }
         });
     });
-});
+  });
+</script>
+
+<!-- M-Pesa Style Checkout Modal -->
+<div
+  class="modal fade"
+  id="checkoutModal"
+  tabindex="-1"
+  aria-labelledby="checkoutLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div
+      class="modal-content border-0 shadow-lg rounded-4"
+      style="background: linear-gradient(135deg, #0f3460 0%, #1a5276 100%)"
+    >
+      <div
+        class="modal-header border-0 pb-2"
+        style="
+          background: linear-gradient(135deg, #0f3460 0%, #16a34a 100%);
+          border-radius: 16px 16px 0 0;
+        "
+      >
+        <div>
+          <h5 class="modal-title text-white fw-bold" id="checkoutLabel">
+            💳 Confirm Payment
+          </h5>
+          <p class="text-white-50 small mb-0">M-Pesa Checkout</p>
+        </div>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body text-white p-4">
+        <!-- Amount Display -->
+        <div
+          class="card mb-4 text-center border-0"
+          style="background: rgba(255, 255, 255, 0.1)"
+        >
+          <div class="card-body py-4">
+            <p class="text-white-50 mb-1">Amount to Pay</p>
+            <h3
+              class="fw-bold mb-0"
+              id="paymentAmount"
+              style="color: #16a34a; font-size: 2.5rem"
+            >
+              KES {{ total|floatformat:2 }}
+            </h3>
+          </div>
+        </div>
+
+        <!-- Phone Number Input -->
+        <div class="mb-4">
+          <label
+            for="phoneNumber"
+            class="form-label text-white fw-semibold mb-2"
+          >
+            📱 Phone Number (M-Pesa)
+          </label>
+          <div class="input-group">
+            <span
+              class="input-group-text border-0"
+              style="
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                font-weight: bold;
+              "
+              >+254</span
+            >
+            <input
+              type="tel"
+              class="form-control form-control-lg border-0"
+              id="phoneNumber"
+              placeholder="712345678"
+              pattern="[0-9]{9}"
+              style="
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                font-weight: 500;
+              "
+              maxlength="9"
+            />
+          </div>
+          <small class="text-white-50 d-block mt-2"
+            >Enter your 9-digit Safaricom M-Pesa number</small
+          >
+        </div>
+
+        <!-- Order Summary -->
+        <div
+          class="card border-0 mb-4"
+          style="background: rgba(255, 255, 255, 0.05)"
+        >
+          <div class="card-body">
+            <h6 class="text-white fw-semibold mb-3">Order Details</h6>
+            <div class="d-flex justify-content-between mb-2 small">
+              <span class="text-white-50">Items:</span>
+              <span class="text-white fw-semibold"
+                >{{ cart_items|length }}</span
+              >
+            </div>
+            <div class="d-flex justify-content-between small">
+              <span class="text-white-50">Total:</span>
+              <span class="text-white fw-semibold" style="color: #16a34a"
+                >KES {{ total|floatformat:2 }}</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms -->
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" id="termsCheck" />
+          <label class="form-check-label text-white-50 small" for="termsCheck">
+            I confirm the transaction amount and agree to the terms
+          </label>
+        </div>
+      </div>
+
+      <div
+        class="modal-footer border-0 pt-0"
+        style="background: rgba(0, 0, 0, 0.2)"
+      >
+        <button
+          type="button"
+          class="btn btn-secondary btn-lg"
+          data-bs-dismiss="modal"
+          style="background: rgba(255, 255, 255, 0.2); border: none"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-success btn-lg fw-bold"
+          id="submitPaymentBtn"
+          style="background: #16a34a; border: none; padding: 0.75rem 2rem"
+        >
+          Complete Payment 🔒
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal-content {
+    color: white;
+  }
+  #phoneNumber::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  #phoneNumber:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
+    border-color: #16a34a !important;
+    box-shadow: 0 0 0 0.2rem rgba(22, 163, 74, 0.3) !important;
+  }
+  .btn-success:hover {
+    background: #15803d !important;
+    transform: scale(1.02);
+  }
+  .btn-success:active {
+    transform: scale(0.98);
+  }
+</style>
+
+<script>
+  // Handle payment submission
+  document
+    .getElementById("submitPaymentBtn")
+    .addEventListener("click", function () {
+      const phoneNumber = document.getElementById("phoneNumber").value.trim();
+      const termsCheck = document.getElementById("termsCheck").checked;
+      const totalAmount = "{{ total|floatformat:2 }}";
+
+      // Validation
+      if (!phoneNumber) {
+        alert("Please enter your M-Pesa phone number");
+        return;
+      }
+
+      if (phoneNumber.length !== 9 || isNaN(phoneNumber)) {
+        alert("Please enter a valid 9-digit phone number");
+        return;
+      }
+
+      if (!termsCheck) {
+        alert("Please agree to the terms");
+        return;
+      }
+
+      // Submit checkout
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = '{% url "checkout" %}';
+
+      const fieldsToAdd = [
+        { name: "csrfmiddlewaretoken", value: "{{ csrf_token }}" },
+        { name: "phone_number", value: "+254" + phoneNumber },
+        { name: "amount", value: totalAmount },
+      ];
+
+      fieldsToAdd.forEach((field) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = field.name;
+        input.value = field.value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+
+      // Show processing message
+      const btn = document.getElementById("submitPaymentBtn");
+      const originalText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = "⏳ Processing...";
+
+      setTimeout(() => {
+        form.submit();
+      }, 500);
+    });
 </script>
 
 {% else %}
 <div class="text-center py-5">
-    <h4 class="fw-semibold">Your cart is empty</h4>
-    <p class="text-muted mb-4">Looks like you haven’t added anything yet.</p>
-    <a href="/shop/" class="btn btn-dark">Continue Shopping</a>
+  <h4 class="fw-semibold">Your cart is empty</h4>
+  <p class="text-muted mb-4">Looks like you haven’t added anything yet.</p>
+  <a href="/shop/" class="btn btn-dark">Continue Shopping</a>
 </div>
-{% endif %}
-
-{% endblock %}
+{% endif %} {% endblock %}

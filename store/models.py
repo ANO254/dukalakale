@@ -81,6 +81,29 @@ class BlogPost(models.Model):
 
 
 # =========================
+# Blog Block Model (image / text blocks)
+# =========================
+class BlogBlock(models.Model):
+    BLOCK_TYPES = [
+        ('text', 'Text'),
+        ('image', 'Image'),
+    ]
+
+    post = models.ForeignKey(BlogPost, related_name='blocks', on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
+    block_type = models.CharField(max_length=10, choices=BLOCK_TYPES, default='text')
+    text = models.TextField(blank=True)
+    image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
+    caption = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.post.title} - {self.get_block_type_display()} ({self.order})"
+
+
+# =========================
 # Gallery Image Model
 # =========================
 class GalleryImage(models.Model):
