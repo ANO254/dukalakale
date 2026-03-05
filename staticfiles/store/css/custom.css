@@ -1,0 +1,33 @@
+/* Custom site styles */
+:root{
+  --brand: #FFD700;
+  --accent: #FFD700;
+  --muted: #6b7280;
+}
+body{
+  background: #000000;
+  color: #FFD700;
+}
+.navbar-brand{font-weight:700}
+.card{border-radius:12px}
+.card-img-top{border-top-left-radius:12px;border-top-right-radius:12px}
+.btn-dark{background:#111827;border:0}
+.btn-dark:hover{background:#0b1220}
+.container.mt-4{padding-top:1rem}
+.hero-image{max-height:360px;object-fit:cover}
+
+/* Social Media Icons Hover Effect */
+.hover-icon {
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.hover-icon:hover {
+  transform: scale(1.2);
+  color: #3b82f6 !important;
+}
+
+/* Small responsive tweaks */
+@media (max-width:576px){
+  .hero-image{max-height:220px}
+}

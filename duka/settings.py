@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS can be set via env var (comma-separated)
-pip freeze > requirements.txt
+ALLOWED_HOSTS = ['*']
 #RUNWAY
 
 
