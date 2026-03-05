@@ -27,7 +27,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS can be set via env var (comma-separated)
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,*.railway.app,*.ngrok-free.dev').split(',')
+pip freeze > requirements.txt
+#RUNWAY
+
+
+
 
 # Railway environment detection
 IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
@@ -74,6 +78,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 # Add WhiteNoise middleware dynamically if package is installed
