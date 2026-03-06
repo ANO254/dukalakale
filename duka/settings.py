@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS can be set via env var (comma-separated)
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 #RUNWAY
 
 
@@ -44,7 +44,10 @@ if IS_RAILWAY:
 STATIC_URL = '/static/'
 
 # Directory for collected static files (for deployment)
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Optional if you want a global static folder outside apps
 STATICFILES_DIRS = [
