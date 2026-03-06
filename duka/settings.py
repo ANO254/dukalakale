@@ -48,6 +48,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+WHITENOISE_MAX_AGE = 31536000
+WHITENOISE_AUTOREFRESH = True
+WHITENOISE_USE_FINDERS = True
 
 # Optional if you want a global static folder outside apps
 STATICFILES_DIRS = [
@@ -74,8 +77,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # WhiteNoise inserted below only if available to avoid import errors in dev
+    # WhiteNoise inserted below only if  available to avoid import errors in dev
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -105,6 +109,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+        'debug': DEBUG,
         },
     },
 ]
@@ -212,3 +217,22 @@ EMAIL_HOST_USER = 'youremail@gmail.com'        # ← replace with your Gmail
 EMAIL_HOST_PASSWORD = 'your_app_password'      # ← replace with Gmail App Password
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+# ================= PERFORMANCE CACHING =================
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "duka-cache",
+    }
+}
+# ================= DATABASE PERFORMANCE =================
+
+DATABASES['default']['CONN_MAX_AGE'] = 600
+
+SECURE_REFERRER_POLICY = "same-origin"
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True

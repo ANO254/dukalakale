@@ -1,15 +1,16 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 User = get_user_model()
-
 
 # =========================
 # Category Model
 # =========================
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, db_index=True)
 
     def __str__(self):
         return self.name
@@ -21,10 +22,15 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, db_index=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to="products/")
+    image = ProcessedImageField(
+        upload_to="products/",
+        processors=[ResizeToFill(800, 800)],
+        format='JPEG',
+        options={'quality': 80},
+    )
     stock = models.PositiveIntegerField(default=0)
     available = models.BooleanField(default=True)
 
@@ -37,7 +43,12 @@ class Product(models.Model):
 # =========================
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='products/')
+    image = ProcessedImageField(
+        upload_to='products/',
+        processors=[ResizeToFill(800, 800)],
+        format='JPEG',
+        options={'quality': 80},
+    )
     alt_text = models.CharField(max_length=200, blank=True)
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -62,9 +73,14 @@ class BlogPost(models.Model):
         ('Lifestyle', 'Lifestyle'),
         ('Other', 'Other'),
     ]
-    
+
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='blog_images/')
+    image = ProcessedImageField(
+        upload_to='blog_images/',
+        processors=[ResizeToFill(1200, 800)],
+        format='JPEG',
+        options={'quality': 80},
+    )
     excerpt = models.TextField(max_length=500, default='')
     content = models.TextField()
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Other')
@@ -93,7 +109,14 @@ class BlogBlock(models.Model):
     order = models.PositiveIntegerField(default=0)
     block_type = models.CharField(max_length=10, choices=BLOCK_TYPES, default='text')
     text = models.TextField(blank=True)
-    image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
+    image = ProcessedImageField(
+        upload_to='blog_images/',
+        processors=[ResizeToFill(1200, 800)],
+        format='JPEG',
+        options={'quality': 80},
+        blank=True,
+        null=True,
+    )
     caption = models.CharField(max_length=255, blank=True)
 
     class Meta:
@@ -117,9 +140,14 @@ class GalleryImage(models.Model):
         ('Water', 'Water'),
         ('Other', 'Other'),
     ]
-    
+
     title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='gallery_images/')
+    image = ProcessedImageField(
+        upload_to='gallery_images/',
+        processors=[ResizeToFill(1200, 800)],
+        format='JPEG',
+        options={'quality': 80},
+    )
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Other')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     featured = models.BooleanField(default=False)
@@ -141,6 +169,7 @@ STATUS_CHOICES = [
     ('Canceled', 'Canceled'),
 ]
 
+
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
@@ -152,10 +181,9 @@ class Order(models.Model):
         return f"Order {self.id} by {self.user.username}"
 
     def calculate_total(self):
-        """Calculate total price based on all order items."""
         total = sum(item.price * item.quantity for item in self.items.all())
         self.total_price = total
-        self.save()
+        self.save(update_fields=['total_price'])
         return self.total_price
 
 
@@ -169,11 +197,9 @@ class OrderItem(models.Model):
         return f"{self.product.name} ({self.quantity})"
 
     def save(self, *args, **kwargs):
-        # Ensure price is synced with product price
         if not self.price:
             self.price = self.product.price
         super().save(*args, **kwargs)
-        # Update the order total automatically
         self.order.calculate_total()
 
 
