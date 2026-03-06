@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block content %}
+
 {% block extra_css %}
 <style>
   /* Shop Title */
@@ -11,10 +11,10 @@
 
   /* Scrollable products container */
   .products-scroll-container {
-    max-height: 80vh;           /* ← adjust this value to your liking (70vh–85vh common) */
+    max-height: 80vh;
     overflow-y: auto;
-    padding-right: 10px;        /* prevent scrollbar overlap with content */
-    scrollbar-width: thin;      /* Firefox */
+    padding-right: 10px;
+    scrollbar-width: thin;
   }
 
   .products-scroll-container::-webkit-scrollbar {
@@ -35,19 +35,18 @@
     background: #5c5b5b;
   }
 
-  /* Product Card */
   .product-card {
     position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
     border: 1px solid #484646;
     height: 100%;
-    background: #e4cead;           /* better dark mode contrast */
+    background: #e4cead;
   }
 
   .product-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.35) !important;
   }
 
   .product-image-container {
@@ -71,14 +70,13 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(217, 151, 27, 0.7);
+    background: rgba(217,151,27,0.7);
     color: white;
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.85rem;
   }
 
-  /* Lightbox – unchanged */
   .lightbox-modal {
     display: none;
     position: fixed;
@@ -87,7 +85,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0,0,0,0.95);
   }
 
   .lightbox-modal.active {
@@ -103,7 +101,7 @@
     background: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   }
 
   .lightbox-header {
@@ -127,7 +125,6 @@
     font-size: 2rem;
     cursor: pointer;
     color: #3d3c3c;
-    padding: 0;
   }
 
   .lightbox-close:hover {
@@ -204,214 +201,270 @@
     text-align: center;
   }
 
-  .lightbox-stock.in-stock  { background: #dcfce7; color: #166534; }
-  .lightbox-stock.low-stock { background: #fef3c7; color: #92400e; }
-  .lightbox-stock.out-of-stock { background: #fee2e2; color: #991b1b; }
+  .lightbox-stock.in-stock { background:#dcfce7; color:#166534; }
+  .lightbox-stock.low-stock { background:#fef3c7; color:#92400e; }
+  .lightbox-stock.out-of-stock { background:#fee2e2; color:#991b1b; }
 
   .lightbox-actions {
-    display: flex;
-    gap: 1rem;
+    display:flex;
+    gap:1rem;
   }
 
   .lightbox-btn {
-    flex: 1;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    flex:1;
+    padding:0.75rem 1.5rem;
+    font-size:1rem;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    font-weight:600;
   }
 
   .lightbox-btn-primary {
-    background: #1e1d1d;
-    color: white;
+    background:#1e1d1d;
+    color:white;
   }
 
-  .lightbox-btn-primary:hover:not(:disabled) {
-    background: #252627;
+  .lightbox-btn-primary:hover:not(:disabled){
+    background:#252627;
   }
 
-  .lightbox-btn-primary:disabled {
-    background: #d1d5db;
-    cursor: not-allowed;
+  .lightbox-btn-secondary{
+    background:#e5e7eb;
+    color:#111;
   }
 
-  .lightbox-btn-secondary {
-    background: #e5e7eb;
-    color: #111;
+  .lightbox-btn-secondary:hover{
+    background:#8aa9d7;
   }
 
-  .lightbox-btn-secondary:hover {
-    background: #8aa9d7;
-  }
-
-  @media (max-width: 768px) {
-    .lightbox-body {
-      grid-template-columns: 1fr;
+  @media (max-width:768px){
+    .lightbox-body{
+      grid-template-columns:1fr;
     }
-    .lightbox-main-image {
-      height: 250px;
+
+    .lightbox-main-image{
+      height:250px;
     }
-    .products-scroll-container {
-      max-height: 70vh;
+
+    .products-scroll-container{
+      max-height:70vh;
     }
   }
 </style>
 {% endblock %}
 
+{% block content %}
+
 <h2 class="mb-3 text-center shop-title"
-    style="color: #d4a017; font-family: 'Oswald', sans-serif; letter-spacing: 2px; font-size: 2rem;">
-  DUKA
+style="color:#d4a017;font-family:'Oswald',sans-serif;letter-spacing:2px;font-size:2rem;">
+DUKA
 </h2>
 
-<div class="container" style="background-color: #000000; padding: 1.5rem; border-radius: 10px; width: 100%; max-width: 1400px; margin: 0 auto;">
-  <div class="products-scroll-container">
-    <div class="row g-4">
-      {% for product in products %}
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-        <div
-          class="card h-100 shadow-sm border-0 product-card"
-          onclick="showLightbox('{{ product.id }}', '{{ product.name|escapejs }}', '{{ product.description|escapejs }}', {{ product.price }}, {{ product.stock }})"
-        >
-          <div class="product-image-container">
-            <img
-              src="{{ product.image.url }}"
-              class="product-image card-img-top"
-              alt="{{ product.name }}"
-            />
-            {% if product.images.count > 0 %}
-            <span class="gallery-indicator">
-              {{ product.images.count }} more
-            </span>
-            {% endif %}
-          </div>
-          <div class="card-body d-flex flex-column">
-            <h5 class="card-title fw-semibold">{{ product.name }}</h5>
-            <p class="card-text text-muted mb-2">KES {{ product.price }}</p>
-            <a
-              href="{% url 'add_to_cart' product.id %}"
-              class="btn btn-dark mt-auto w-100"
-              onclick="event.stopPropagation();"
-            >
-              🛒 Add to Cart
-            </a>
-          </div>
-        </div>
-      </div>
-      {% empty %}
-      <p class="text-center text-muted col-12">No products available.</p>
-      {% endfor %}
-    </div>
-  </div>
+<div class="container" style="background-color:#000;padding:1.5rem;border-radius:10px;width:100%;max-width:1400px;margin:0 auto;">
+
+<div class="products-scroll-container">
+
+<div class="row g-4">
+
+{% for product in products %}
+
+<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+
+<div class="card h-100 shadow-sm border-0 product-card"
+onclick="showLightbox('{{ product.id }}','{{ product.name|escapejs }}','{{ product.description|escapejs }}',{{ product.price }},{{ product.stock }})">
+
+<div class="product-image-container">
+
+<img src="{{ product.image.url }}"
+class="product-image card-img-top"
+alt="{{ product.name }}"/>
+
+{% if product.images.count > 0 %}
+<span class="gallery-indicator">
+{{ product.images.count }} more
+</span>
+{% endif %}
+
 </div>
 
-<!-- Lightbox Modal → exactly the same as yours -->
+<div class="card-body d-flex flex-column">
+
+<h5 class="card-title fw-semibold">
+{{ product.name }}
+</h5>
+
+<p class="card-text text-muted mb-2">
+KES {{ product.price }}
+</p>
+
+<a href="{% url 'add_to_cart' product.id %}"
+class="btn btn-dark mt-auto w-100"
+onclick="event.stopPropagation();">
+
+🛒 Add to Cart
+
+</a>
+
+</div>
+</div>
+</div>
+
+{% empty %}
+
+<p class="text-center text-muted col-12">
+No products available.
+</p>
+
+{% endfor %}
+
+</div>
+</div>
+</div>
+
+<!-- LIGHTBOX (UNCHANGED) -->
+
 <div id="lightboxModal" class="lightbox-modal">
-  <div class="lightbox-content">
-    <div class="lightbox-header">
-      <h2 class="lightbox-title" id="lightboxTitle"></h2>
-      <button class="lightbox-close" onclick="closeLightbox()">×</button>
-    </div>
-    <div class="lightbox-body">
-      <div class="lightbox-images">
-        <img id="lightboxMainImage" src="" alt="Product" class="lightbox-main-image" />
-        <div id="lightboxThumbnails" class="lightbox-thumbnails"></div>
-      </div>
-      <div class="lightbox-info">
-        <div class="lightbox-price" id="lightboxPrice"></div>
-        <div class="lightbox-description" id="lightboxDescription"></div>
-        <div id="lightboxStock" class="lightbox-stock"></div>
-        <div class="lightbox-actions">
-          <button class="lightbox-btn lightbox-btn-primary" id="lightboxAddBtn" onclick="addToCart()">
-            🛒 Add to Cart
-          </button>
-          <button class="lightbox-btn lightbox-btn-secondary" onclick="closeLightbox()">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+
+<div class="lightbox-content">
+
+<div class="lightbox-header">
+<h2 class="lightbox-title" id="lightboxTitle"></h2>
+<button class="lightbox-close" onclick="closeLightbox()">×</button>
 </div>
 
+<div class="lightbox-body">
+
+<div class="lightbox-images">
+<img id="lightboxMainImage" src="" class="lightbox-main-image"/>
+<div id="lightboxThumbnails" class="lightbox-thumbnails"></div>
+</div>
+
+<div class="lightbox-info">
+
+<div class="lightbox-price" id="lightboxPrice"></div>
+
+<div class="lightbox-description" id="lightboxDescription"></div>
+
+<div id="lightboxStock" class="lightbox-stock"></div>
+
+<div class="lightbox-actions">
+
+<button class="lightbox-btn lightbox-btn-primary"
+id="lightboxAddBtn"
+onclick="addToCart()">
+
+🛒 Add to Cart
+
+</button>
+
+<button class="lightbox-btn lightbox-btn-secondary"
+onclick="closeLightbox()">
+
+Close
+
+</button>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- YOUR SCRIPT UNCHANGED -->
 <script>
-// Your original script – unchanged
+
 const productImagesData = {
-  {% for product in products %}
-  {{ product.id }}: [
-    "{{ product.image.url }}"
-    {% for img in product.images.all %}, "{{ img.image.url }}"{% endfor %}
-  ]{% if not forloop.last %},{% endif %}
-  {% endfor %}
+{% for product in products %}
+{{ product.id }}:[
+"{{ product.image.url }}"
+{% for img in product.images.all %},"{{ img.image.url }}"{% endfor %}
+]{% if not forloop.last %},{% endif %}
+{% endfor %}
 };
 
-let currentProductId = null;
+let currentProductId=null;
 
-function showLightbox(productId, name, description, price, stock) {
-  currentProductId = productId;
-  document.getElementById('lightboxTitle').textContent = name;
-  document.getElementById('lightboxPrice').textContent = 'KES ' + price.toFixed(2);
-  document.getElementById('lightboxDescription').textContent = description;
+function showLightbox(productId,name,description,price,stock){
 
-  const stockEl = document.getElementById('lightboxStock');
-  const addBtn = document.getElementById('lightboxAddBtn');
+currentProductId=productId;
 
-  if (stock === 0) {
-    stockEl.textContent = '❌ Out of Stock';
-    stockEl.className = 'lightbox-stock out-of-stock';
-    addBtn.disabled = true;
-  } else if (stock < 5) {
-    stockEl.textContent = '⚠️ Only ' + stock + ' left!';
-    stockEl.className = 'lightbox-stock low-stock';
-    addBtn.disabled = false;
-  } else {
-    stockEl.textContent = '✅ In Stock';
-    stockEl.className = 'lightbox-stock in-stock';
-    addBtn.disabled = false;
-  }
+document.getElementById('lightboxTitle').textContent=name;
 
-  const images = productImagesData[productId] || [];
-  document.getElementById('lightboxMainImage').src = images[0] || '';
+document.getElementById('lightboxPrice').textContent='KES '+price.toFixed(2);
 
-  const thumbsEl = document.getElementById('lightboxThumbnails');
-  thumbsEl.innerHTML = '';
+document.getElementById('lightboxDescription').textContent=description;
 
-  images.forEach((img, index) => {
-    const thumb = document.createElement('img');
-    thumb.src = img;
-    thumb.className = 'lightbox-thumbnail' + (index === 0 ? ' active' : '');
-    thumb.onclick = () => {
-      document.getElementById('lightboxMainImage').src = img;
-      document.querySelectorAll('.lightbox-thumbnail').forEach((t, i) => {
-        t.classList.toggle('active', i === index);
-      });
-    };
-    thumbsEl.appendChild(thumb);
-  });
+const stockEl=document.getElementById('lightboxStock');
+const addBtn=document.getElementById('lightboxAddBtn');
 
-  document.getElementById('lightboxModal').classList.add('active');
+if(stock===0){
+stockEl.textContent='❌ Out of Stock';
+stockEl.className='lightbox-stock out-of-stock';
+addBtn.disabled=true;
+}
+else if(stock<5){
+stockEl.textContent='⚠️ Only '+stock+' left!';
+stockEl.className='lightbox-stock low-stock';
+addBtn.disabled=false;
+}
+else{
+stockEl.textContent='✅ In Stock';
+stockEl.className='lightbox-stock in-stock';
+addBtn.disabled=false;
 }
 
-function closeLightbox() {
-  document.getElementById('lightboxModal').classList.remove('active');
-  currentProductId = null;
-}
+const images=productImagesData[productId]||[];
 
-function addToCart() {
-  if (currentProductId) {
-    window.location.href = '/add-to-cart/' + currentProductId + '/';
-  }
-}
+document.getElementById('lightboxMainImage').src=images[0]||'';
 
-document.getElementById('lightboxModal').addEventListener('click', (e) => {
-  if (e.target.id === 'lightboxModal') closeLightbox();
+const thumbsEl=document.getElementById('lightboxThumbnails');
+
+thumbsEl.innerHTML='';
+
+images.forEach((img,index)=>{
+
+const thumb=document.createElement('img');
+
+thumb.src=img;
+
+thumb.className='lightbox-thumbnail'+(index===0?' active':'');
+
+thumb.onclick=()=>{
+document.getElementById('lightboxMainImage').src=img;
+
+document.querySelectorAll('.lightbox-thumbnail').forEach((t,i)=>{
+t.classList.toggle('active',i===index);
+});
+};
+
+thumbsEl.appendChild(thumb);
+
 });
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeLightbox();
+document.getElementById('lightboxModal').classList.add('active');
+
+}
+
+function closeLightbox(){
+document.getElementById('lightboxModal').classList.remove('active');
+currentProductId=null;
+}
+
+function addToCart(){
+if(currentProductId){
+window.location.href='/add-to-cart/'+currentProductId+'/';
+}
+}
+
+document.getElementById('lightboxModal').addEventListener('click',(e)=>{
+if(e.target.id==='lightboxModal')closeLightbox();
 });
+
+document.addEventListener('keydown',(e)=>{
+if(e.key==='Escape')closeLightbox();
+});
+
 </script>
 
 {% endblock %}
