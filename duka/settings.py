@@ -27,16 +27,16 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS can be set via env var (comma-separated)
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['.onrender.com']
 #RUNWAY
 
 
 
 
 # Railway environment detection
-IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
-if IS_RAILWAY:
-    DEBUG = False
+#IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+#if IS_RAILWAY:
+  #  DEBUG = False
 
 
 
