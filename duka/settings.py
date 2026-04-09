@@ -34,9 +34,9 @@ ALLOWED_HOSTS = ['.onrender.com']
 
 
 # Railway environment detection
-#IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
-#if IS_RAILWAY:
-  #  DEBUG = False
+IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
+if os.environ.get('DATABASE_URL'):
+    DEBUG = False
 
 
 
@@ -120,8 +120,8 @@ WSGI_APPLICATION = 'duka.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Use PostgreSQL in production (Railway), SQLite locally
-if IS_RAILWAY or os.environ.get('DATABASE_URL'):
+# Use PostgreSQL in production (Render / Railway), SQLite locally
+if os.environ.get('DATABASE_URL'):
     try:
         import dj_database_url
         DATABASES = {
@@ -132,7 +132,7 @@ if IS_RAILWAY or os.environ.get('DATABASE_URL'):
             )
         }
     except ImportError:
-        # Fallback if dj_database_url not installed
+        # Fallback if dj_database_url is unavailable
         DATABASES = {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
@@ -186,13 +186,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Use whitenoise staticfiles storage in production when available
-if IS_RAILWAY:
+if IS_PRODUCTION:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 else:
     STATICFILES_STORAGE = os.environ.get('DJANGO_STATICFILES_STORAGE', 'whitenoise.storage.CompressedManifestStaticFilesStorage')
 
 # Security settings for production
-if IS_RAILWAY or not DEBUG:
+if IS_PRODUCTION:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -200,7 +200,7 @@ if IS_RAILWAY or not DEBUG:
     SECURE_CONTENT_SECURITY_POLICY = {
         'default-src': ("'self'",),
     }
-    ALLOWED_HOSTS = ['*']  # Railway handles domain routing
+    ALLOWED_HOSTS = ['*']  # Railway/Render handle domain routing
 
 
 
