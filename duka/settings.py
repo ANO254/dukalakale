@@ -186,7 +186,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Use whitenoise staticfiles storage in production when available
-if IS_PRODUCTION:
+if os.environ.get('RENDER') or os.environ.get('DATABASE_URL'):
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 else:
     STATICFILES_STORAGE = os.environ.get('DJANGO_STATICFILES_STORAGE', 'whitenoise.storage.CompressedManifestStaticFilesStorage')
