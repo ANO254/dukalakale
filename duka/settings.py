@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS can be set via env var (comma-separated)
-ALLOWED_HOSTS = ['.onrender.com']
+ALLOWED_HOSTS = ['.onrender.com', '127.0.0.1', 'localhost']
 #RUNWAY
 
 
@@ -37,6 +37,9 @@ ALLOWED_HOSTS = ['.onrender.com']
 IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') is not None
 if os.environ.get('DATABASE_URL'):
     DEBUG = False
+
+# Determine if we're in production
+IS_PRODUCTION = not DEBUG
 
 
 
@@ -57,11 +60,6 @@ STATICFILES_DIRS = [
     BASE_DIR / "store" / "static",
 ]
 
-
-import os
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
@@ -101,7 +99,10 @@ ROOT_URLCONF = 'duka.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "store" / "templates"],
+        'DIRS': [
+            BASE_DIR / "store" / "templates",
+            BASE_DIR / "dashboard" / "templates",
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -209,12 +210,12 @@ if IS_PRODUCTION:
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 
-EMAIL_HOST_USER = 'youremail@gmail.com'        # ← replace with your Gmail
-EMAIL_HOST_PASSWORD = 'your_app_password'      # ← replace with Gmail App Password
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'youremail@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'your_app_password')
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
