@@ -2,25 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "duka/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "runtime": "python3.11" }
-    },
-    {
-      "src": "requirements.txt",
+      "src": "api/index.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "duka/wsgi.py"
+      "dest": "/api/index.py"
     }
-  ],
-  "env": {
-    "DJANGO_SECRET_KEY": "@secret",
-    "DJANGO_DEBUG": "False",
-    "DJANGO_ALLOWED_HOSTS": ".vercel.app",
-    "PYTHON_VERSION": "3.11"
-  }
+  ]
 }
