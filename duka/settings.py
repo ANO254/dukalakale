@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-l=r0qjaxw^pb=!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS can be set via env var (comma-separated)
-ALLOWED_HOSTS = ['.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '.onrender.com, .vercel.app, 127.0.0.1, localhost').split(',')
 #RUNWAY
 
 
