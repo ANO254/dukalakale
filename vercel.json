@@ -8,8 +8,21 @@
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
+    {
+      "src": "/media/(.*)",
+      "dest": "/media/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/api/index.py"
     }
-  ]
+  ],
+  "env": {
+    "DJANGO_SECRET_KEY": "@django-secret-key",
+    "DJANGO_DEBUG": "False",
+    "DJANGO_ALLOWED_HOSTS": "@django-allowed-hosts"
+  }
 }
