@@ -1,29 +1,34 @@
 ﻿"""
 Django settings for duka project.
 """
-from pathlib import Path
 import os
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-key-change-in-production')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').strip().lower() in {'1', 'true', 'yes', 'on'}
 
-# Parse ALLOWED_HOSTS - handle both with and without spaces
 hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost')
-ALLOWED_HOSTS = [h.strip() for h in hosts.split(',') if h.strip()]
+ALLOWED_HOSTS = [host.strip() for host in hosts.split(',') if host.strip()]
 
-# Only force production settings when DEBUG is explicitly off.
-# This prevents local development from redirecting HTTP to HTTPS when a DATABASE_URL
-# is set in the shell or a local environment.
-if os.environ.get('DATABASE_URL') and os.environ.get('DJANGO_DEBUG') is None:
-    DEBUG = False
+# Render provides this hostname automatically. Custom domains remain configurable
+# through DJANGO_ALLOWED_HOSTS.
+render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_host and render_host not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_host)
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
 
 IS_PRODUCTION = not DEBUG
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [BASE_DIR / "store" / "static"]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'store' / 'static']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -67,9 +72,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'duka.wsgi.application'
 
-if os.environ.get('DATABASE_URL'):
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
     import dj_database_url
-    DATABASES = {'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=600)}
+
+    DATABASES = {
+        'default': dj_database_url.config(default=database_url, conn_max_age=600)
+    }
 else:
     DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}}
 
@@ -89,8 +98,15 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 if IS_PRODUCTION:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STORAGES = {
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
+    # Render terminates HTTPS at its proxy and forwards the original protocol.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31_536_000
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 else:
@@ -108,5 +124,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "duka-cache"}}
 
 SECURE_REFERRER_POLICY = "same-origin"
-SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
