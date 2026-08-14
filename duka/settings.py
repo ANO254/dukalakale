@@ -7,10 +7,16 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dev-key-change-in-production')
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '.onrender.com, .vercel.app, 127.0.0.1, localhost').split(',')
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').strip().lower() in {'1', 'true', 'yes', 'on'}
 
-if os.environ.get('DATABASE_URL'):
+# Parse ALLOWED_HOSTS - handle both with and without spaces
+hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost')
+ALLOWED_HOSTS = [h.strip() for h in hosts.split(',') if h.strip()]
+
+# Only force production settings when DEBUG is explicitly off.
+# This prevents local development from redirecting HTTP to HTTPS when a DATABASE_URL
+# is set in the shell or a local environment.
+if os.environ.get('DATABASE_URL') and os.environ.get('DJANGO_DEBUG') is None:
     DEBUG = False
 
 IS_PRODUCTION = not DEBUG
@@ -87,8 +93,10 @@ if IS_PRODUCTION:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    ALLOWED_HOSTS = ['*']
-
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
