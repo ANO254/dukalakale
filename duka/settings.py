@@ -106,6 +106,8 @@ if IS_PRODUCTION:
     # Render terminates HTTPS at its proxy and forwards the original protocol.
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
+    # Render's internal health check is HTTP-only.
+    SECURE_REDIRECT_EXEMPT = [r'^healthz/$']
     SECURE_HSTS_SECONDS = 31_536_000
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
